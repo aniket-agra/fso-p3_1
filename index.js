@@ -53,6 +53,18 @@ app.delete("/api/persons/:id", (req, res) => {
 
 app.post("/api/persons", (req,res) => {
     const newPersonData = req.body;
+    let flagNoName = newPersonData["name"] === undefined || newPersonData["name"].length === 0;
+    let flagNoUniqueName = data.filter(element => element["name"] === newPersonData["name"]).length > 0;
+    let flagNoNumber = newPersonData["number"] === undefined || newPersonData["number"].length === 0;
+    if (flagNoName) {
+        return res.status(400).json({error : "Name missing"});
+    }
+    if (flagNoUniqueName) {
+        return res.status(400).json({error : "Name must be unique"});
+    }
+    if (flagNoNumber) {
+        return res.status(400).json({error : "Number missing"});
+    }
     newPersonData.id = Math.ceil(100000*Math.random());
     data = data.concat(newPersonData);
 });
