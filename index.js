@@ -30,9 +30,7 @@ app.get("/api/persons", (req, res) => {
 
 app.get("/info", (req, res) => {
     let retStr = `<p>Phonebook has info for ${data.length} people</p>`;
-    let currentTime = new Date();
-    retStr = retStr.concat(`<p>${currentTime}</p>`);
-    console.log(retStr);
+    retStr = retStr.concat(`<p>${new Date()}</p>`);
     res.send(retStr);
 })
 
