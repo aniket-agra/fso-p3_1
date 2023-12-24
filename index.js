@@ -1,7 +1,13 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 
+morgan.token("postContent", function (req, res) {
+    return JSON.stringify(req.body);
+});
+
 app.use(express.json());
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :postContent"));
 
 let data = [
     { 
@@ -52,7 +58,7 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 app.post("/api/persons", (req,res) => {
-    const newPersonData = req.body;
+    const newPersonData = {...req.body};
     let flagNoName = newPersonData["name"] === undefined || newPersonData["name"].length === 0;
     let flagNoUniqueName = data.filter(element => element["name"] === newPersonData["name"]).length > 0;
     let flagNoNumber = newPersonData["number"] === undefined || newPersonData["number"].length === 0;
@@ -67,6 +73,7 @@ app.post("/api/persons", (req,res) => {
     }
     newPersonData.id = Math.ceil(100000*Math.random());
     data = data.concat(newPersonData);
+    res.status(200).end();
 });
 
 const PORT = 3001;
