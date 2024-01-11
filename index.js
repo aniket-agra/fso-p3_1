@@ -20,8 +20,9 @@ app.get("/api/persons", (req, res) => {
     Entry.find({}).then(result => res.json(result));
 })
 
-app.get("/info", (req, res) => {
-    let retStr = `<p>Phonebook has info for ${data.length} people</p>`;
+app.get("/info", async function (req, res) {
+    let count = await Entry.countDocuments({});
+    let retStr = `<p>Phonebook has info for ${count} people</p>`;
     retStr = retStr.concat(`<p>${new Date()}</p>`);
     res.send(retStr);
 })
