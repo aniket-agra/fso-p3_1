@@ -30,11 +30,11 @@ app.get("/info", (req, res) => {
 
 app.get("/api/persons/:id", (req, res) => {
     Entry.findById(req.params.id).then(result => {
-        res.json(result);
-    }).catch(error => {
-        console.log("Entry not found", error.message);
+        if (result)
+           res.json(result);
+        else
         res.status(404).end();
-    });
+    }).catch(error => next(error));
 });
 
 app.delete("/api/persons/:id", (req, res) => {
@@ -67,6 +67,18 @@ app.post("/api/persons", (req,res) => {
         res.status(200).end();
     })
 });
+
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message);
+
+    if (error.name === "CastError") {
+        return res.status(400).send({error : "malformed id"});
+    }
+
+    next(error);
+}
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
