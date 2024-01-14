@@ -33,7 +33,7 @@ app.get("/api/persons/:id", (req, res) => {
         if (result)
            res.json(result);
         else
-        res.status(404).end();
+            res.status(404).end();
     }).catch(error => next(error));
 });
 
