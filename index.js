@@ -29,12 +29,12 @@ app.get("/info", (req, res) => {
 })
 
 app.get("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id);
-    const personData = data.filter(element => element.id === id);
-    if (personData.length > 0) 
-        res.json(...personData);
-    else
+    Entry.findById(req.params.id).then(result => {
+        res.json(result);
+    }).catch(error => {
+        console.log("Entry not found", error.message);
         res.status(404).end();
+    });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
@@ -46,20 +46,26 @@ app.delete("/api/persons/:id", (req, res) => {
 app.post("/api/persons", (req,res) => {
     const newPersonData = {...req.body};
     let flagNoName = newPersonData["name"] === undefined || newPersonData["name"].length === 0;
-    let flagNoUniqueName = data.filter(element => element["name"] === newPersonData["name"]).length > 0;
+    // let flagNoUniqueName = data.filter(element => element["name"] === newPersonData["name"]).length > 0;
     let flagNoNumber = newPersonData["number"] === undefined || newPersonData["number"].length === 0;
     if (flagNoName) {
         return res.status(400).json({error : "Name missing"});
     }
-    if (flagNoUniqueName) {
-        return res.status(400).json({error : "Name must be unique"});
-    }
+    // if (flagNoUniqueName) {
+    //     return res.status(400).json({error : "Name must be unique"});
+    // }
     if (flagNoNumber) {
         return res.status(400).json({error : "Number missing"});
     }
-    newPersonData.id = Math.ceil(100000*Math.random());
-    data = data.concat(newPersonData);
-    res.status(200).end();
+    const newEntry = new Entry({
+        name : newPersonData["name"],
+        number : newPersonData["number"]
+    });
+
+    newEntry.save().then(result => {
+        console.log("saved ", result);
+        res.status(200).end();
+    })
 });
 
 const PORT = process.env.PORT || 3001;
